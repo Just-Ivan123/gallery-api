@@ -29,11 +29,11 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::controller(GalleryController::class)->group(function () {
-    Route::get('/', 'index');
+    Route::get('/galleries', 'index');
     Route::get('/{id}', 'show');
     Route::get('/author/{user_id}', 'userGalleries');
     Route::get('/my-galleries', 'userGalleries');
-    Route::post('/', 'store');
+    Route::post('/galleries', 'store');
     Route::put('/{id}', 'update');
     Route::delete('/{id}', 'destroy');
 });
