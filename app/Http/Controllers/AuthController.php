@@ -44,4 +44,12 @@ class AuthController extends Controller
 
         return response()->json($response);
     }
+
+    public function checkAuthentication(Request $request)
+    {
+        $token = $request->input('token');
+        $response = $this->authService->checkAuthentication($token);
+
+        return response()->json($response);
+    }
 }

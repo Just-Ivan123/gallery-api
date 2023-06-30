@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services; 
 
 use App\Http\Requests\GalleryRequest;
 use App\Models\Gallery;
@@ -9,7 +9,7 @@ use App\Models\Image;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-
+use Illuminate\Database\Eloquent\Builder;
 
 class GalleryService
 {
@@ -20,15 +20,27 @@ class GalleryService
         $this->user = $user;
     }
     
-    public function getAllGalleries()
+    public function getAllGalleries($searchQuery = null)
     {
-        $galleries = Gallery::with(['user' => function ($query) {
+        $query = Gallery::with(['user' => function ($query) {
             $query->select('id', 'first_name', 'last_name');
         }])
-        ->with('images') // Remove the take(1) method call
-        ->paginate(10);
-        
-        
+        ->with('images')
+        ->orderBy('created_at', 'desc');
+    
+        if ($searchQuery) {
+            $query->where(function (Builder $query) use ($searchQuery) {
+                $query->where('title', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('description', 'like', '%' . $searchQuery . '%')
+                    ->orWhereHas('user', function (Builder $query) use ($searchQuery) {
+                        $query->where('first_name', 'like', '%' . $searchQuery . '%')
+                            ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                    });
+            });
+        }
+    
+        $galleries = $query->paginate(10);
+    
         return $galleries;
     }
 
@@ -37,21 +49,29 @@ class GalleryService
         return Gallery::with(['user', 'images', 'comments'])->findOrFail($id);
     }
 
-    public function getUserGalleries($user_id)
+    public function getUserGalleries($user_id, $searchQuery = null)
     {
-        $user = User::findOrFail($user_id);
-    
-        $galleries = Gallery::where('user_id', $user_id)
-            ->with('images')
-            ->paginate(10);
+        $query = Gallery::where('user_id', $user_id)
+        ->with(['user' => function ($query) {
+            $query->select('id', 'first_name', 'last_name');
+        }])
+        ->with('images')
+        ->orderBy('created_at', 'desc');
 
-        return [
-            'user' => [
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-            ],
-            'galleries' => $galleries,
-        ];
+    if ($searchQuery) {
+        $query->where(function (Builder $query) use ($searchQuery) {
+            $query->where('title', 'like', '%' . $searchQuery . '%')
+                ->orWhere('description', 'like', '%' . $searchQuery . '%')
+                ->orWhereHas('user', function (Builder $query) use ($searchQuery) {
+                    $query->where('first_name', 'like', '%' . $searchQuery . '%')
+                        ->orWhere('last_name', 'like', '%' . $searchQuery . '%');
+                });
+        });
+    }
+
+    $galleries = $query->paginate(10);
+
+    return $galleries;
     }
 
     public function createGallery(GalleryRequest $request)
@@ -74,7 +94,8 @@ class GalleryService
 
             $image->save();
         }
-
+        $gallery->load('user', 'images');
+        
         return $gallery;
    
     }

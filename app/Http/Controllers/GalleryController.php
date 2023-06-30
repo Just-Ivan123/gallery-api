@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\GalleryService;
 use App\Http\Requests\GalleryRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class GalleryController extends Controller
 {
@@ -15,9 +16,10 @@ class GalleryController extends Controller
         $this->galleryService = $galleryService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $galleries = $this->galleryService->getAllGalleries();
+        $searchQuery = $request->query('search');
+        $galleries = $this->galleryService->getAllGalleries($searchQuery);
         return $galleries;
     }
 
@@ -27,17 +29,18 @@ class GalleryController extends Controller
         return response()->json($gallery);
     }
 
-    public function userGalleries($user_id)
+    public function userGalleries(Request $request , $user_id)
     {
-        $galleries = $this->galleryService->getUserGalleries($user_id);
-        return response()->json($galleries);
+        $searchQuery = $request->query('search');
+        $galleries = $this->galleryService->getUserGalleries($user_id, $searchQuery);
+        return $galleries;
     }
 
     public function store(GalleryRequest $request)
     {
         try {
             $gallery = $this->galleryService->createGallery($request);
-            return response()->json($gallery);
+            return $gallery;
         } catch (\Exception $e) {
             return $e;
         }

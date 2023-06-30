@@ -26,12 +26,13 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
+    Route::post('/check-authentication', 'checkAuthentication');
 });
 
 Route::controller(GalleryController::class)->group(function () {
     Route::get('/galleries', 'index');
     Route::get('/{id}', 'show');
-    Route::get('/author/{user_id}', 'userGalleries');
+    Route::get('/galleries/author/{user_id}', 'userGalleries');
     Route::get('/my-galleries', 'userGalleries');
     Route::post('/galleries', 'store');
     Route::put('/{id}', 'update');

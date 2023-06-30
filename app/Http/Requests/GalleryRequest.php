@@ -14,8 +14,8 @@ class GalleryRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required',
-            'description' => 'required',
+            'title' => 'required|min:2|max:255',
+            'description' => 'nullable|max:1000',
             'imageUrls' => 'required|array',
             'imageUrls.*' => ['required', 'regex:/\.(png|jpeg|jpg)$/i'],
         ];

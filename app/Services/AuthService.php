@@ -69,4 +69,21 @@ class AuthService
             ]
         ];
     }
+
+    public function checkAuthentication($token)
+{
+    $user = Auth::setToken($token)->user();
+    
+    if (!$user) {
+        return [
+            'status' => 'error',
+            'message' => 'Invalid token',
+        ];
+    }
+    
+    return [
+        'status' => 'success',
+        'user' => $user,
+    ];
+}
 }
