@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\CommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,10 +32,15 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::controller(GalleryController::class)->group(function () {
     Route::get('/galleries', 'index');
-    Route::get('/{id}', 'show');
+    Route::get('/galleries/{id}', 'show');
     Route::get('/galleries/author/{user_id}', 'userGalleries');
     Route::get('/my-galleries', 'userGalleries');
     Route::post('/galleries', 'store');
-    Route::put('/{id}', 'update');
-    Route::delete('/{id}', 'destroy');
+    Route::put('/galleries/{id}', 'update');
+    Route::delete('/galleries/{id}', 'destroy');
+});
+
+Route::controller(CommentController::class)->group(function () {
+    Route::post('/galleries/comment', 'store');
+    Route::delete('/galleries/comment/{id}', 'destroy');
 });

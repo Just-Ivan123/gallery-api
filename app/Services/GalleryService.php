@@ -46,7 +46,9 @@ class GalleryService
 
     public function getGalleryById($id)
     {
-        return Gallery::with(['user', 'images', 'comments'])->findOrFail($id);
+        return Gallery::with(['user', 'images', 'comments' => function ($query) {
+            $query->orderBy('created_at', 'desc')->with('user'); 
+        }])->findOrFail($id);
     }
 
     public function getUserGalleries($user_id, $searchQuery = null)
@@ -116,14 +118,15 @@ class GalleryService
 
         $imageUrls = $validatedData['imageUrls'];
         foreach ($imageUrls as $imageUrl) {
-            $image = Image::create([
+            $image = $gallery->images()->create([
                 'url' => $imageUrl,
                 'gallery_id' => $gallery->id,
             ]);
 
             $image->save();
         }
-
+        $gallery->load('user', 'images');
+        
         return $gallery;
     }
 

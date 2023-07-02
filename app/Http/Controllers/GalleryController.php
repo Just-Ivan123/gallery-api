@@ -26,7 +26,7 @@ class GalleryController extends Controller
     public function show($id)
     {
         $gallery = $this->galleryService->getGalleryById($id);
-        return response()->json($gallery);
+        return $gallery;
     }
 
     public function userGalleries(Request $request , $user_id)
@@ -38,12 +38,10 @@ class GalleryController extends Controller
 
     public function store(GalleryRequest $request)
     {
-        try {
+        
             $gallery = $this->galleryService->createGallery($request);
-            return $gallery;
-        } catch (\Exception $e) {
-            return $e;
-        }
+            return response()->json($gallery);
+       
     }
 
     public function update(GalleryRequest $request, $id)
@@ -54,6 +52,6 @@ class GalleryController extends Controller
 
     public function destroy($id)
     {
-        return $this->galleryService->deleteGallery($id);
+        return $this->galleryService->deleteComment($id);
     }
 }

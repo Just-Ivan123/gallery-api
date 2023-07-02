@@ -20,4 +20,6 @@ class GalleryRequest extends FormRequest
             'imageUrls.*' => ['required', 'regex:/\.(png|jpeg|jpg)$/i'],
         ];
     }
+
+    
 }
